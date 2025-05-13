@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fiap-lanches-product-api
+  name: fiap-lanches-product-api
+  namespace: fiap-lanches-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fiap-lanches-product-api
+  template:
+    metadata:
+      labels:
+        app: fiap-lanches-product-api
+      name: fiap-lanches-product-api
+    spec:
+      containers:
+        - image: docker.io/dalexandrias/fiap-lanches-product-app:1.0
+          imagePullPolicy: IfNotPresent
+          name: fiap-lanches-client-api
+          ports:
+            - containerPort: 8085
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: fiap-lanches-product-config
+          env:
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: fiap-lanches-product-secrets
+                  optional: false
+      restartPolicy: Always

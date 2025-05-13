@@ -1,0 +1,28 @@
+server:
+  port: 8082
+minio:
+  url: http://173.249.12.112:9000
+  access-key: ${MINIO_ACCESS_KEY:SAbx113Aam8BnOnBF2o5}
+  secret-key: ${MINIO_SECRET_KEY:OBdQcJCipQ7ZoQJFSR20AOiSkNEjP9xYPDYcg10F}
+  bucket: fit-food-image-product
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/postgres
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:create}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
