@@ -4,6 +4,7 @@ import br.com.fiaplanchesproduct.domain.enums.Category;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,8 +21,16 @@ public record RequestProductDto(
         @NotNull(message = "Categoria nao pode ser vazio")
         @Enumerated(EnumType.STRING)
         Category category,
+        
         String description,
-        String imageUrl
+        
+        String imageUrl,
+        
+        @NotNull(message = "Estoque não pode ser vazio")
+        @Min(value = 0, message = "Estoque deve ser maior ou igual a 0")
+        Integer estoque,
+        
+        Boolean ativo
 ) {
     public ProductDto toProductDto() {
         return new ProductDto(
@@ -31,7 +40,9 @@ public record RequestProductDto(
                 this.category,
                 this.description,
                 null,
-                this.imageUrl
+                this.imageUrl,
+                this.estoque,
+                this.ativo != null ? this.ativo : true
         );
     }
 }

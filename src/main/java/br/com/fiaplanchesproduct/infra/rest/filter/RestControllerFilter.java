@@ -26,11 +26,13 @@ import java.util.UUID;
 @Slf4j
 @WebFilter("/*")
 public class RestControllerFilter extends OncePerRequestFilter {
-    private static final AntPathMatcher matcher = new AntPathMatcher();
-
-    // Lista de rotas que você quer pular
+    private static final AntPathMatcher matcher = new AntPathMatcher();    // Lista de rotas que você quer pular
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/v1/product/*/image"     // POST de upload
+            "/v1/product/*/image",     // POST de upload
+            "/swagger-ui.html",        // Swagger UI
+            "/swagger-ui/**",          // Recursos da Swagger UI
+            "/api-docs/**",            // OpenAPI docs
+            "/v3/api-docs/**"          // OpenAPI docs v3
             // ,"/actuator/**"      // exemplo: se quiser ignorar actuator
     );
 

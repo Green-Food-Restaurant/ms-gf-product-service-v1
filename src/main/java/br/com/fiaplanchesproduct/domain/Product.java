@@ -15,11 +15,11 @@ public class Product {
     private String descricao;
     private String keyImage;
     private String urlImage;
-
-    public Product() {
+    private Integer estoque;
+    private boolean ativo = true;    public Product() {
     }
 
-    public Product(Long id, String nomeProduto, BigDecimal preco, Category category, String descricao, String keyImage, String urlImage) {
+    public Product(Long id, String nomeProduto, BigDecimal preco, Category category, String descricao, String keyImage, String urlImage, Integer estoque, boolean ativo) {
         this.id = id;
         this.nomeProduto = nomeProduto;
         this.preco = preco;
@@ -27,9 +27,9 @@ public class Product {
         this.descricao = descricao;
         this.keyImage = keyImage;
         this.urlImage = urlImage;
-    }
-
-    public Product updateProduct(Product novoProduto) {
+        this.estoque = estoque;
+        this.ativo = ativo;
+    }    public Product updateProduct(Product novoProduto) {
         if (!novoProduto.getNomeProduto().isEmpty()) {
             setNomeProduto(novoProduto.getNomeProduto());
         }
@@ -39,7 +39,21 @@ public class Product {
         if (novoProduto.getPreco() != null) {
             setPreco(novoProduto.getPreco());
         }
-
+        if (novoProduto.getDescricao() != null) {
+            setDescricao(novoProduto.getDescricao());
+        }
+        if (novoProduto.getEstoque() != null) {
+            setEstoque(novoProduto.getEstoque());
+        }
+        
         return this;
+    }
+    
+    public void ativar() {
+        this.ativo = true;
+    }
+    
+    public void desativar() {
+        this.ativo = false;
     }
 }

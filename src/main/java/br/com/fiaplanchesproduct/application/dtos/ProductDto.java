@@ -12,10 +12,10 @@ public record ProductDto(
         Category category,
         String descricao,
         String keyImage,
-        String urlImage
-) {
-
-    public static ProductDto toProductDto(Product produto) {
+        String urlImage,
+        Integer estoque,
+        boolean ativo
+) {    public static ProductDto toProductDto(Product produto) {
         return new ProductDto(
                 produto.getId(),
                 produto.getNomeProduto(),
@@ -23,7 +23,9 @@ public record ProductDto(
                 produto.getCategory(),
                 produto.getDescricao(),
                 produto.getKeyImage(),
-                produto.getUrlImage()
+                produto.getUrlImage(),
+                produto.getEstoque(),
+                produto.isAtivo()
         );
     }
 
@@ -35,7 +37,9 @@ public record ProductDto(
                 this.category,
                 this.descricao,
                 this.keyImage,
-                this.urlImage
+                this.urlImage,
+                this.estoque,
+                this.ativo
         );
     }
 }

@@ -27,8 +27,8 @@ public class ProductEntity {
     private String keyImage;
     @Column(length = 1000)
     private String urlImage;
-
-    public static ProductEntity toProductEntity(ProductDto productDTO) {
+    private Integer estoque;
+    private boolean ativo = true;    public static ProductEntity toProductEntity(ProductDto productDTO) {
         return new ProductEntity(
                 productDTO.id(),
                 productDTO.nomeProduto(),
@@ -36,11 +36,11 @@ public class ProductEntity {
                 productDTO.category(),
                 productDTO.descricao(),
                 productDTO.keyImage(),
-                productDTO.urlImage()
+                productDTO.urlImage(),
+                productDTO.estoque(),
+                productDTO.ativo()
         );
-    }
-
-    public ProductDto toProductDto() {
+    }    public ProductDto toProductDto() {
         return new ProductDto(
                 this.id,
                 this.nomeProduto,
@@ -48,7 +48,9 @@ public class ProductEntity {
                 this.category,
                 this.descricao,
                 this.keyImage,
-                this.urlImage
+                this.urlImage,
+                this.estoque,
+                this.ativo
         );
     }
 }
