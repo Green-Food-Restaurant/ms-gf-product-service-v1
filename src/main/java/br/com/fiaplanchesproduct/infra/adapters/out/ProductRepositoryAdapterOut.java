@@ -88,12 +88,18 @@ public class ProductRepositoryAdapterOut implements ProductRepositoryPortOut {
     @Override
     public Page<ProductDto> findProductsByFilters(
             Category category, 
+            Long subcategoryId, // Adicionado subcategoryId
             BigDecimal precoMinimo, 
             BigDecimal precoMaximo, 
             Boolean ativo, 
             Pageable pageable) {
         Page<ProductEntity> productEntities = postGresProductRepository.findByFilters(
-                category, precoMinimo, precoMaximo, ativo, pageable);
+                category, subcategoryId, precoMinimo, precoMaximo, ativo, pageable);
         return productEntities.map(ProductEntity::toProductDto);
+    }
+
+    @Override
+    public boolean existsBySubcategoryId(Long subcategoryId) {
+        return postGresProductRepository.existsBySubcategory_Id(subcategoryId);
     }
 }

@@ -3,7 +3,6 @@ package br.com.fiaplanchesproduct.application.usecases;
 import br.com.fiaplanchesproduct.application.dtos.ProductDto;
 import br.com.fiaplanchesproduct.application.ports.out.ProductRepositoryPortOut;
 import br.com.fiaplanchesproduct.domain.enums.Category;
-import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,13 +10,17 @@ import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 
-@AllArgsConstructor
 public class FilterProductsUseCase {
 
     private final ProductRepositoryPortOut productRepositoryPortOut;
 
+    public FilterProductsUseCase(ProductRepositoryPortOut productRepositoryPortOut) {
+        this.productRepositoryPortOut = productRepositoryPortOut;
+    }
+
     public Page<ProductDto> filterProducts(
             Category category,
+            Long subcategoryId,
             BigDecimal precoMinimo,
             BigDecimal precoMaximo,
             Boolean ativo,
@@ -33,7 +36,7 @@ public class FilterProductsUseCase {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         return productRepositoryPortOut.findProductsByFilters(
-                category, precoMinimo, precoMaximo, ativo, pageable);
+                category, subcategoryId, precoMinimo, precoMaximo, ativo, pageable);
     }
     
     public Page<ProductDto> findProductsByPriceRange(

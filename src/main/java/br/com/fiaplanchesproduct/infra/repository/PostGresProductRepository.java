@@ -28,15 +28,19 @@ public interface PostGresProductRepository extends JpaRepository<ProductEntity, 
     
     @Query("SELECT p FROM ProductEntity p WHERE " +
            "(:category IS NULL OR p.category = :category) AND " +
+           "(:subcategoryId IS NULL OR p.subcategory.id = :subcategoryId) AND " +
            "(:precoMinimo IS NULL OR p.preco >= :precoMinimo) AND " +
            "(:precoMaximo IS NULL OR p.preco <= :precoMaximo) AND " +
            "(:ativo IS NULL OR p.ativo = :ativo)")
     Page<ProductEntity> findByFilters(
             @Param("category") Category category,
+            @Param("subcategoryId") Long subcategoryId,
             @Param("precoMinimo") BigDecimal precoMinimo,
             @Param("precoMaximo") BigDecimal precoMaximo,
             @Param("ativo") Boolean ativo,
             Pageable pageable);
     
     Page<ProductEntity> findAll(Pageable pageable);
+    
+    boolean existsBySubcategory_Id(Long subcategoryId);
 }

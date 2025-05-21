@@ -32,7 +32,8 @@ public class OpenApiConfig {
                 .tags(List.of(
                         new Tag().name("Produtos").description("Operações relacionadas a produtos"),
                         new Tag().name("Imagens").description("Operações relacionadas a imagens de produtos"),
-                        new Tag().name("Filtros").description("Filtros e pesquisas de produtos")
+                        new Tag().name("Filtros").description("Filtros e pesquisas de produtos"),
+                        new Tag().name("Documentação").description("Documentação e referências da API")
                 ));
     }
 }

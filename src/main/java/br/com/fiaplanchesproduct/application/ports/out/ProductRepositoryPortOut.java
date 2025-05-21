@@ -37,8 +37,11 @@ public interface ProductRepositoryPortOut {
     
     Page<ProductDto> findProductsByFilters(
             Category category, 
+            Long subcategoryId, // Adicionado subcategoryId
             BigDecimal precoMinimo, 
             BigDecimal precoMaximo, 
             Boolean ativo, 
             Pageable pageable);
+
+    boolean existsBySubcategoryId(Long subcategoryId); // Novo método
 }

@@ -8,15 +8,18 @@ public record ResponseProductDto(
         Long id, 
         String nomeProduto, 
         BigDecimal preco, 
-        Category category, 
+        Category category, // Categoria principal
+        ResponseSubcategoryDto subcategory,
         String descricao,
         String urlImage,
         Integer estoque,
-        boolean ativo
+        boolean ativo,
+        String sku,
+        String barcode
 ) {
 
     public ResponseProductDto(Long id, String nomeProduto, BigDecimal preco, Category category) {
-        this(id, nomeProduto, preco, category, null, null, 0, true);
+        this(id, nomeProduto, preco, category, null, null, null, 0, true, null, null);
     }
 
     public static ResponseProductDto toResponseProductDto(ProductDto productDTO) {
@@ -24,11 +27,14 @@ public record ResponseProductDto(
                 productDTO.id(),
                 productDTO.nomeProduto(),
                 productDTO.preco(),
-                productDTO.category(),
+                productDTO.category(), // Categoria principal
+                productDTO.subcategory() != null ? ResponseSubcategoryDto.fromSubcategoryDto(productDTO.subcategory()) : null,
                 productDTO.descricao(),
                 productDTO.urlImage(),
                 productDTO.estoque(),
-                productDTO.ativo()
+                productDTO.ativo(),
+                productDTO.sku(),
+                productDTO.barcode()
         );
     }
 }

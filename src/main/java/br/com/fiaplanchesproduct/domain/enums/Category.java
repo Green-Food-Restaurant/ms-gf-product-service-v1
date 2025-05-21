@@ -4,5 +4,6 @@ public enum Category {
     LANCHE,
     ACOMPANHAMENTO,
     BEBIDA,
-    SOBREMESA
+    SOBREMESA,
+    SALADAS
 }

@@ -1,0 +1,489 @@
+{
+	"info": {
+		"_postman_id": "e3b1a7d5-f2d6-4a9e-9c30-8e3f0f8c5b8d",
+		"name": "FIAP Lanches - API de Produtos",
+		"description": "Coleção para testar a API de gerenciamento de produtos do FIAP Lanches",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Produtos (CRUD)",
+			"item": [
+				{
+					"name": "Listar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/find?page=0&size=5&sortBy=nomeProduto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"find"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								},
+								{
+									"key": "sortBy",
+									"value": "nomeProduto"
+								}
+							]
+						},
+						"description": "Lista todos os produtos com suporte a paginação e ordenação."
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Produtos por IDs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/find/ids?ids=1,3,5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"find",
+								"ids"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "1,3,5"
+								}
+							]
+						},
+						"description": "Retorna produtos específicos a partir de seus IDs."
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Produto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nameProduct\": \"X-Bacon Duplo\",\n    \"price\": 24.90,\n    \"category\": \"LANCHE\",\n    \"description\": \"Hambúrguer com queijo, bacon duplo, alface, tomate e molho especial\",\n    \"estoque\": 30,\n    \"ativo\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/product",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product"
+							]
+						},
+						"description": "Cadastra um novo produto no sistema."
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Produto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nameProduct\": \"X-Bacon Duplo Premium\",\n    \"price\": 26.90,\n    \"category\": \"LANCHE\",\n    \"description\": \"Hambúrguer com queijo especial, bacon duplo, alface, tomate e molho premium\",\n    \"estoque\": 25,\n    \"ativo\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/{{productId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"{{productId}}"
+							]
+						},
+						"description": "Atualiza as informações de um produto existente."
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir Produto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/{{productId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"{{productId}}"
+							]
+						},
+						"description": "Remove um produto do catálogo."
+					},
+					"response": []
+				},
+				{
+					"name": "Ativar Produto",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/{{productId}}/activate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"{{productId}}",
+								"activate"
+							]
+						},
+						"description": "Ativa um produto que estava desativado."
+					},
+					"response": []
+				},
+				{
+					"name": "Desativar Produto",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/{{productId}}/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"{{productId}}",
+								"deactivate"
+							]
+						},
+						"description": "Desativa um produto sem excluí-lo do catálogo."
+					},
+					"response": []
+				}
+			],
+			"description": "Operações básicas de CRUD para gerenciamento de produtos"
+		},
+		{
+			"name": "Filtros de Produtos",
+			"item": [
+				{
+					"name": "Filtro Avançado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/filter?category=LANCHE&precoMinimo=15&precoMaximo=25&ativo=true&page=0&size=10&sortBy=preco&direction=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "LANCHE"
+								},
+								{
+									"key": "precoMinimo",
+									"value": "15"
+								},
+								{
+									"key": "precoMaximo",
+									"value": "25"
+								},
+								{
+									"key": "ativo",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "preco"
+								},
+								{
+									"key": "direction",
+									"value": "asc"
+								}
+							]
+						},
+						"description": "Filtra produtos com base em múltiplos critérios combinados."
+					},
+					"response": []
+				},
+				{
+					"name": "Filtro por Categoria (Paginado)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/filter/category?category=BEBIDA&page=0&size=10&sortBy=preco",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"filter",
+								"category"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "BEBIDA"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "preco"
+								}
+							]
+						},
+						"description": "Busca produtos por categoria com suporte a paginação."
+					},
+					"response": []
+				},
+				{
+					"name": "Busca por Categoria (Simples)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/filter/category/SOBREMESA",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"filter",
+								"category",
+								"SOBREMESA"
+							]
+						},
+						"description": "Retorna todos os produtos de uma categoria específica."
+					},
+					"response": []
+				},
+				{
+					"name": "Filtro por Faixa de Preço",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/filter/price?precoMinimo=5&precoMaximo=10&page=0&size=10&sortBy=preco",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"filter",
+								"price"
+							],
+							"query": [
+								{
+									"key": "precoMinimo",
+									"value": "5"
+								},
+								{
+									"key": "precoMaximo",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "preco"
+								}
+							]
+						},
+						"description": "Busca produtos dentro de uma faixa de preço específica."
+					},
+					"response": []
+				},
+				{
+					"name": "Filtro por Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/filter/status?ativo=false&page=0&size=10&sortBy=nomeProduto",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"filter",
+								"status"
+							],
+							"query": [
+								{
+									"key": "ativo",
+									"value": "false"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "nomeProduto"
+								}
+							]
+						},
+						"description": "Busca produtos ativos ou inativos."
+					},
+					"response": []
+				}
+			],
+			"description": "Operações de filtro e pesquisa de produtos"
+		},
+		{
+			"name": "Imagens de Produtos",
+			"item": [
+				{
+					"name": "Upload de Imagem",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/image.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/{{productId}}/image",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"{{productId}}",
+								"image"
+							]
+						},
+						"description": "Faz upload de uma imagem para um produto específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Download de Imagem",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/product/{{productId}}/image",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"product",
+								"{{productId}}",
+								"image"
+							]
+						},
+						"description": "Obtém a URL da imagem de um produto específico."
+					},
+					"response": []
+				}
+			],
+			"description": "Operações relacionadas a imagens de produtos"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

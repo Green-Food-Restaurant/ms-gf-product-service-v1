@@ -20,29 +20,51 @@ public record RequestProductDto(
 
         @NotNull(message = "Categoria nao pode ser vazio")
         @Enumerated(EnumType.STRING)
-        Category category,
-        
+        Category category, // Categoria principal
+
+        Long subcategoryId, // ID da subcategoria
+
         String description,
-        
+
         String imageUrl,
-        
+
         @NotNull(message = "Estoque não pode ser vazio")
         @Min(value = 0, message = "Estoque deve ser maior ou igual a 0")
         Integer estoque,
-        
-        Boolean ativo
+
+        Boolean ativo,
+
+        String sku,
+
+        String barcode
 ) {
     public ProductDto toProductDto() {
+        // A lógica para buscar a SubcategoryEntity pelo subcategoryId e converter para SubcategoryDto
+        // precisará ser implementada no serviço/use case, pois o DTO não deve ter acesso a repositórios.
+        // Por enquanto, passaremos null para subcategory no ProductDto e o serviço se encarregará de popular.
+        SubcategoryDto subcategoryDto = null; 
+        // Se subcategoryId for fornecido, o serviço deverá buscar a Subcategory e criar o SubcategoryDto.
+        // Exemplo (a ser implementado no serviço):
+        // if (this.subcategoryId != null) {
+        //     Subcategory subcategory = subcategoryRepository.findById(this.subcategoryId).orElse(null);
+        //     if (subcategory != null) {
+        //         subcategoryDto = SubcategoryDto.fromSubcategory(subcategory);
+        //     }
+        // }
+
         return new ProductDto(
                 null,
                 this.nameProduct,
                 this.price,
-                this.category,
+                this.category, // Categoria principal
+                subcategoryDto, // Será preenchido pelo serviço
                 this.description,
                 null,
                 this.imageUrl,
                 this.estoque,
-                this.ativo != null ? this.ativo : true
+                this.ativo != null ? this.ativo : true,
+                this.sku,
+                this.barcode
         );
     }
 }
