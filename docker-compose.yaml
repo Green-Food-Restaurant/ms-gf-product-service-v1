@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  fiap-lanchonet-network:
+    external: true
+
 services:
   postgres-db-product:
     image: postgres
@@ -26,6 +30,8 @@ services:
       - "9000:9000"                     # API S3-compatible
       - "9001:9001"                     # Console web
     command: server /data --console-address ":9001"
+    networks:
+      - fiap-lanchonet-network
 
   fiap-lanches-product-api:
     build:
@@ -40,10 +46,6 @@ services:
       - postgres-db-product
     networks:
       - fiap-lanchonet-network
-        
-networks:
-  fiap-lanchonet-network:
-    external: true
 
 volumes:
   postgres-db-product:
