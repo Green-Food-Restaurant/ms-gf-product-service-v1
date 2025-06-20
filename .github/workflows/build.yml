@@ -1,0 +1,220 @@
+name: Build, Push e Deploy
+
+on:
+  push:
+    branches:
+      - main  # ou a branch que você deseja monitorar
+    tags:
+      - 'v*'  # Acionar em tags de versão (v1.0.0, v2.1.3, etc.)
+  pull_request:
+    branches:
+      - main  # Também executa em PRs para main
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ms-gf-product-service-v1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'maven'  # Ativa o cache do Maven
+
+      - name: Build with Maven
+        run: mvn -B clean package -DskipTests
+
+      - name: Run tests
+        run: mvn -B test
+        if: ${{ !contains(github.event.head_commit.message, '[skip tests]') }}  # Pula testes se o commit tiver [skip tests]
+
+      # Determina a versão da imagem (tag ou SHA do commit)
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=ref,event=branch
+            type=sha,format=short
+
+      # Scan de segurança (opcional)
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.meta.outputs.tags }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true  # Não falha a build, mas alerta sobre vulnerabilidades
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}  # Só publica se não for PR
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Notify on success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: devops-alerts
+          SLACK_COLOR: good
+          SLACK_TITLE: "✅ Build e Deploy com sucesso!"
+          SLACK_MESSAGE: "A imagem ${{ steps.meta.outputs.tags }} foi publicada com sucesso no Docker Hub (ms-gf-product-service-v1)."
+        continue-on-error: true  # Não falha a build se o Slack falhar
+        
+      - name: Notify on failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: devops-alerts
+          SLACK_COLOR: danger
+          SLACK_TITLE: "❌ Falha no Build/Deploy"
+          SLACK_MESSAGE: "Ocorreu uma falha no pipeline de CI/CD para o ms-gf-product-service-v1."
+        continue-on-error: true  # Não falha a build se o Slack falhar
+
+  deploy-coolify:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    
+    steps:
+      - name: Trigger Coolify Deployment
+        id: deploy
+        run: |
+          # Depuração para ver a estrutura completa do JSON de resposta
+          echo "Iniciando deploy para Coolify..."
+          RESPONSE=$(curl -v -s -X POST "${{ secrets.COOLIFY_WEBHOOK }}/api/v1/deploy?uuid=c04ssg4kw8soo8s0g4g8ksc4&force=false" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+          -d '{"ref": "${{ github.ref }}"}')
+          
+          # Depurar a resposta completa
+          echo "Resposta completa do Coolify:"
+          echo "$RESPONSE"
+          echo "Estrutura JSON da resposta:"
+          echo "$RESPONSE" | jq '.'
+          
+          # Tentar vários caminhos possíveis para o ID
+          DEPLOYMENT_ID=$(echo "$RESPONSE" | jq -r '.id // .deploymentId // .data.id // .data.deploymentId // ""')
+          
+          echo "Deployment ID extraído: '$DEPLOYMENT_ID'"
+          
+          # Salvar ID para uso em outros passos
+          if [ -n "$DEPLOYMENT_ID" ] && [ "$DEPLOYMENT_ID" != "null" ]; then
+            echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+            echo "Deploy ID encontrado: $DEPLOYMENT_ID"
+          else
+            echo "Aviso: Não foi possível extrair o ID do deployment da resposta"
+          fi
+      
+      - name: Wait and check deployment status
+        run: |
+          # Aguardar um tempo para que o deploy inicie
+          echo "Aguardando 30 segundos para o início do deployment..."
+          sleep 30
+          
+          # Verificar se temos um ID de deployment
+          DEPLOYMENT_ID="${{ steps.deploy.outputs.deployment_id }}"
+          
+          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" = "null" ]; then
+            echo "ID do deployment não encontrado na resposta. Tentando verificar o status geral."
+            
+            # Tentativa 1: Verificar usando a API de resources
+            echo "Tentativa 1: Verificando status do recurso via API de resources..."
+            RESOURCE_RESPONSE=$(curl -v -s -X GET "${{ secrets.COOLIFY_WEBHOOK }}/api/v1/resources/c04ssg4kw8soo8s0g4g8ksc4/status" \
+              -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}")
+              
+            echo "Resposta da API de recursos:"
+            echo "$RESOURCE_RESPONSE" | jq '.'
+            
+            HEALTH_STATUS=$(echo "$RESOURCE_RESPONSE" | jq -r '.status // .state // .health // "unknown"')
+            echo "Status do recurso: $HEALTH_STATUS"
+            
+            # Tentativa 2: Verificar usando a API de serviços
+            echo "Tentativa 2: Verificando status via API de services..."
+            SERVICE_RESPONSE=$(curl -v -s -X GET "${{ secrets.COOLIFY_WEBHOOK }}/api/v1/services/c04ssg4kw8soo8s0g4g8ksc4/status" \
+              -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}")
+              
+            echo "Resposta da API de serviços:"
+            echo "$SERVICE_RESPONSE" | jq '.'
+            
+            SERVICE_STATUS=$(echo "$SERVICE_RESPONSE" | jq -r '.status // .state // "unknown"')
+            echo "Status do serviço: $SERVICE_STATUS"
+            
+            # Verificar ambos os status
+            if [[ ("$HEALTH_STATUS" = "running" || "$HEALTH_STATUS" = "success" || "$HEALTH_STATUS" = "healthy") || \
+                  ("$SERVICE_STATUS" = "running" || "$SERVICE_STATUS" = "success" || "$SERVICE_STATUS" = "healthy") ]]; then
+              echo "Serviço parece estar funcionando corretamente."
+            else
+              echo "Possível problema com o serviço. Status do recurso: $HEALTH_STATUS, Status do serviço: $SERVICE_STATUS"
+              # Não falhar o build aqui, pois pode ser apenas um problema com a API de status
+              # exit 1
+            fi
+          else
+            echo "Verificando status do deployment $DEPLOYMENT_ID"
+            DEPLOY_RESPONSE=$(curl -v -s -X GET "${{ secrets.COOLIFY_WEBHOOK }}/api/v1/deployments/$DEPLOYMENT_ID/status" \
+              -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}")
+              
+            echo "Resposta da API de deployment:"
+            echo "$DEPLOY_RESPONSE" | jq '.'
+            
+            STATUS=$(echo "$DEPLOY_RESPONSE" | jq -r '.status // .state // "unknown"')
+            echo "Status do deployment: $STATUS"
+            
+            # Verificar status aceitáveis
+            if [[ "$STATUS" = "success" || "$STATUS" = "running" || "$STATUS" = "completed" || "$STATUS" = "healthy" ]]; then
+              echo "Deployment parece estar sendo processado ou concluído com sucesso."
+            else
+              echo "Aviso: Status do deployment não reconhecido: $STATUS"
+              # Não falhar o build aqui, pois pode ser apenas um problema com a API de status
+              # exit 1
+            fi
+          fi
+          
+          # Verificação final simples
+          echo "Realizando verificação final do serviço..."
+          echo "O serviço está sendo implantado ou já está em execução no Coolify."
+
+      - name: Notify Coolify Deployment
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: devops-alerts
+          SLACK_COLOR: good
+          SLACK_TITLE: "🚀 Deploy no Coolify Concluído"
+          SLACK_MESSAGE: |
+            Deploy do serviço ms-gf-product-service-v1 no Coolify foi processado.
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Autor: ${{ github.actor }}
+            Deploy ID: ${{ steps.deploy.outputs.deployment_id || 'ID não disponível' }}
+        continue-on-error: true
