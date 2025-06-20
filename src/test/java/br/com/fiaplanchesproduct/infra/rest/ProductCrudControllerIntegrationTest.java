@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import br.com.fiaplanchesproduct.application.ports.out.ProductStoragePortOut;
 
 import java.math.BigDecimal;
 
@@ -24,6 +26,9 @@ class ProductCrudControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private ProductStoragePortOut productStoragePortOut;
 
     @Test
     void testRegisterAndFindProduct() throws Exception {
