@@ -120,13 +120,14 @@ jobs:
           echo "$RESPONSE"
           echo "Estrutura JSON da resposta:"
           echo "$RESPONSE" | jq '.'
-          DEPLOYMENT_ID=$(echo "$RESPONSE" | jq -r '.id // .deploymentId // .data.id // .data.deploymentId // ""')
+          # Extrai resource_uuid do primeiro elemento do array deployments
+          DEPLOYMENT_ID=$(echo "$RESPONSE" | jq -r '.deployments[0].resource_uuid // ""')
           echo "Deployment ID extraído: '$DEPLOYMENT_ID'"
           if [ -n "$DEPLOYMENT_ID" ] && [ "$DEPLOYMENT_ID" != "null" ]; then
             echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
-            echo "Deploy ID encontrado: $DEPLOYMENT_ID"
+            echo "Deploy resource_uuid encontrado: $DEPLOYMENT_ID"
           else
-            echo "Aviso: Não foi possível extrair o ID do deployment da resposta"
+            echo "Aviso: Não foi possível extrair o resource_uuid do deployment da resposta"
           fi
       - name: Wait and check deployment status
         run: |
