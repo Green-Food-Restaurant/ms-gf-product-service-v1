@@ -79,9 +79,10 @@ jobs:
       - name: Get main image tag
         id: get_tag
         run: |
-          # Se a tag principal for 'main', substitui por 'latest'
+          # Extrai apenas a tag da primeira imagem (após o ':')
           TAGS='${{ steps.meta.outputs.tags }}'
-          MAIN_TAG=$(echo "$TAGS" | cut -d',' -f1)
+          MAIN_IMAGE=$(echo "$TAGS" | head -n1)
+          MAIN_TAG=$(echo "$MAIN_IMAGE" | awk -F: '{print $NF}')
           if [ "$MAIN_TAG" = "main" ]; then
             MAIN_TAG="latest"
           fi
