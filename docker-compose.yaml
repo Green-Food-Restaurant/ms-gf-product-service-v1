@@ -30,7 +30,7 @@ services:
       - green-food-network
 
   ms-gf-product-service-v1:
-    image: dalexandrias/ms-gf-product-service-v1:main
+    image: dalexandrias/ms-gf-product-service-v1:latest
     ports:
       - "8082:8082"
     volumes:
