@@ -1,6 +1,5 @@
 FROM maven:latest
 
-ENV SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db-product:5432/fiap-lanches-product
 WORKDIR /app
 RUN rm -rf /app/*
 COPY . /app
