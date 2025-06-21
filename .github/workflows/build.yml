@@ -123,7 +123,7 @@ jobs:
         id: deploy
         run: |
           echo "Iniciando deploy para Coolify..."
-          RESPONSE=$(curl -v -s -X POST "${{ secrets.COOLIFY_WEBHOOK }}/api/v1/deploy?uuid=c04ssg4kw8soo8s0g4g8ksc4&force=false" \
+          RESPONSE=$(curl -v -s -X POST "${{ secrets.COOLIFY_WEBHOOK }}/api/v1/deploy?uuid=aogcko4okgc08o04k88k8s48&force=false" \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
           -d '{"ref": "${{ github.ref }}"}')
