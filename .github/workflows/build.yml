@@ -48,7 +48,7 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=ref,event=branch
+            type=ref,event=branch,enable=true,priority=100,prefix=,suffix=,value=latest,branch=main
             type=sha,format=short
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -79,7 +79,13 @@ jobs:
       - name: Get main image tag
         id: get_tag
         run: |
-          echo "IMAGE_TAG=$(echo '${{ steps.meta.outputs.tags }}' | cut -d',' -f1)" >> $GITHUB_OUTPUT
+          # Se a tag principal for 'main', substitui por 'latest'
+          TAGS='${{ steps.meta.outputs.tags }}'
+          MAIN_TAG=$(echo "$TAGS" | cut -d',' -f1)
+          if [ "$MAIN_TAG" = "main" ]; then
+            MAIN_TAG="latest"
+          fi
+          echo "IMAGE_TAG=$MAIN_TAG" >> $GITHUB_OUTPUT
 
   notify-build:
     needs: docker
