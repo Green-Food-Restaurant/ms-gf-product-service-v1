@@ -1,22 +1,18 @@
 version: '3.8'
 
-networks:
-  fiap-lanchonet-network:
-    external: true
-
 services:
   postgres-db-product:
     image: postgres
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: fiap-lanches-product
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres-db-product:/var/lib/postgresql/data
     networks:
-      - fiap-lanchonet-network
+      - green-food-network
 
   minio:
     image: minio/minio:latest
@@ -31,26 +27,27 @@ services:
       - "9001:9001"                     # Console web
     command: server /data --console-address ":9001"
     networks:
-      - fiap-lanchonet-network
+      - green-food-network
 
-  fiap-lanches-product-api:
-    build:
-     context: .
-     dockerfile: ./Dockerfile
-    hostname: fiap-lanches-product-api
+  ms-gf-product-service-v1:
+    image: dalexandrias/ms-gf-product-service-v1:main
     ports:
       - "8082:8082"
     volumes:
-      - fiap-lanches-product-api:/var/lib/fiaplancher/data
+      - ms-gf-product-service-v1:/var/lib/products/data
     depends_on:
       - postgres-db-product
     networks:
-      - fiap-lanchonet-network
+      - green-food-network
+
+networks:
+  green-food-network:
+    external: true
 
 volumes:
   postgres-db-product:
     driver: local
-  fiap-lanches-product-api:
+  ms-gf-product-service-v1:
     driver: local
   minio-data:
     driver: local

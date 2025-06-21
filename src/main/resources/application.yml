@@ -1,13 +1,13 @@
 server:
   port: 8082
 minio:
-  url: http://173.249.12.112:9000
+  url: ${MINIO_URL:http://173.249.12.112:9000}
   access-key: ${MINIO_ACCESS_KEY:SAbx113Aam8BnOnBF2o5}
   secret-key: ${MINIO_SECRET_KEY:OBdQcJCipQ7ZoQJFSR20AOiSkNEjP9xYPDYcg10F}
-  bucket: fit-food-image-product
+  bucket: ${MINIO_BUCKET:fit-food-image-product}
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/product}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
   jpa:
