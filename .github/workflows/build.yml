@@ -36,7 +36,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     outputs:
-      image_tags: ${{ steps.meta.outputs.tags }}
+      image_tag: ${{ steps.get_tag.outputs.image_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -76,6 +76,10 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
         continue-on-error: true
+      - name: Get main image tag
+        id: get_tag
+        run: |
+          echo "IMAGE_TAG=$(echo '${{ steps.meta.outputs.tags }}' | cut -d',' -f1)" >> $GITHUB_OUTPUT
 
   notify-build:
     needs: docker
@@ -88,7 +92,7 @@ jobs:
           curl -H "Content-Type: application/json" \
             -X POST \
             -d '{
-              "content": "✅ Build e Deploy com sucesso!\nA imagem `${{ needs.docker.outputs.image_tags }}` foi publicada com sucesso no Docker Hub (ms-gf-product-service-v1)."
+              "content": "✅ Build e Deploy com sucesso!\nA imagem `${{ needs.docker.outputs.image_tag }}` foi publicada com sucesso no Docker Hub (ms-gf-product-service-v1)."
             }' \
             "$DISCORD_WEBHOOK"
       - name: Notify on failure (Discord)
