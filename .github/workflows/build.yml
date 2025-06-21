@@ -13,6 +13,7 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ms-gf-product-service-v1
+  DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
 
 jobs:
   build:
@@ -81,27 +82,25 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() }}
     steps:
-      - name: Notify on success
+      - name: Notify on success (Discord)
         if: ${{ needs.docker.result == 'success' }}
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: devops-alerts
-          SLACK_COLOR: good
-          SLACK_TITLE: "✅ Build e Deploy com sucesso!"
-          SLACK_MESSAGE: "A imagem ${{ needs.docker.outputs.image_tags }} foi publicada com sucesso no Docker Hub (ms-gf-product-service-v1)."
-        continue-on-error: true
-      - name: Notify on failure
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "content": "✅ Build e Deploy com sucesso!\nA imagem `${{ needs.docker.outputs.image_tags }}` foi publicada com sucesso no Docker Hub (ms-gf-product-service-v1)."
+            }' \
+            "$DISCORD_WEBHOOK"
+      - name: Notify on failure (Discord)
         if: ${{ needs.docker.result == 'failure' }}
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: devops-alerts
-          SLACK_COLOR: danger
-          SLACK_TITLE: "❌ Falha no Build/Deploy"
-          SLACK_MESSAGE: "Ocorreu uma falha no pipeline de CI/CD para o ms-gf-product-service-v1."
-        continue-on-error: true
-
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "content": "❌ Falha no Build/Deploy\nOcorreu uma falha no pipeline de CI/CD para o ms-gf-product-service-v1."
+            }' \
+            "$DISCORD_WEBHOOK"
+        
   deploy-coolify:
     needs: docker
     runs-on: ubuntu-latest
@@ -178,28 +177,21 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() }}
     steps:
-      - name: Notify Coolify Deployment
+      - name: Notify Coolify Deployment (Discord)
         if: ${{ needs.deploy-coolify.result == 'success' }}
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: devops-alerts
-          SLACK_COLOR: good
-          SLACK_TITLE: "🚀 Deploy no Coolify Concluído"
-          SLACK_MESSAGE: |
-            Deploy do serviço ms-gf-product-service-v1 no Coolify foi processado.
-            Branch: ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Deploy ID: ${{ needs.deploy-coolify.outputs.deployment_id || 'ID não disponível' }}
-        continue-on-error: true
-      - name: Notify Coolify Failure
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "content": "🚀 Deploy no Coolify Concluído\nDeploy do serviço ms-gf-product-service-v1 no Coolify foi processado.\nBranch: `${{ github.ref_name }}`\nCommit: `${{ github.sha }}`\nAutor: `${{ github.actor }}`\nDeploy ID: `${{ needs.deploy-coolify.outputs.deployment_id || 'ID não disponível' }}`"
+            }' \
+            "$DISCORD_WEBHOOK"
+      - name: Notify Coolify Failure (Discord)
         if: ${{ needs.deploy-coolify.result == 'failure' }}
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: devops-alerts
-          SLACK_COLOR: danger
-          SLACK_TITLE: "❌ Falha no Deploy Coolify"
-          SLACK_MESSAGE: "Ocorreu uma falha no deploy do ms-gf-product-service-v1 no Coolify."
-        continue-on-error: true
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "content": "❌ Falha no Deploy Coolify\nOcorreu uma falha no deploy do ms-gf-product-service-v1 no Coolify."
+            }' \
+            "$DISCORD_WEBHOOK"
