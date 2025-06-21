@@ -1,0 +1,11 @@
+Remover todos os arquivos e pastas de teste:
+- src/test/java/ (tudo)
+- src/test/resources/ (tudo)
+
+Isso inclui:
+- br/com/fiaplanchesproduct/domain/ProductTest.java
+- br/com/fiaplanchesproduct/FiapLanchesProductApplicationTests.java
+- br/com/fiaplanchesproduct/infra/rest/ (vazio)
+- src/test/resources/application.yml
+
+Após isso, o projeto não terá mais testes automatizados.
