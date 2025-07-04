@@ -1,4 +1,4 @@
-# 🍔 Microserviço de Gerenciamento de Produtos - FIAP Lanches
+# 🍔 Microserviço de Gerenciamento de Produtos
 
 Este é o microserviço responsável pelo gerenciamento completo de produtos da aplicação FIAP Lanches.
 
