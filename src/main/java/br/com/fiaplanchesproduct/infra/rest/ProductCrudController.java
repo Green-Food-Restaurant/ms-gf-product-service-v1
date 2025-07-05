@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("v1/product")
-@CrossOrigin(origins = "http://localhost:8080")
 @Tag(name = "Produtos", description = "Operações básicas de CRUD para gerenciamento de produtos")
 public class ProductCrudController {
 

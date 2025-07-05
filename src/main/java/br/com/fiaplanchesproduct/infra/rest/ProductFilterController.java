@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("v1/product/filter")
-@CrossOrigin(origins = "http://localhost:8080")
 @Tag(name = "Filtros", description = "Operações de filtro e pesquisa de produtos")
 public class ProductFilterController {
 

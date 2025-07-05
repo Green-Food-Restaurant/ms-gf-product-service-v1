@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("v1/product")
-@CrossOrigin(origins = "http://localhost:8080")
 @Tag(name = "Imagens", description = "Operações relacionadas a imagens de produtos")
 public class ProductImageController {
 
