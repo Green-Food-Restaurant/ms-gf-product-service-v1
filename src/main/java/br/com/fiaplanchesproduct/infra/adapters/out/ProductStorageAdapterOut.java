@@ -29,13 +29,19 @@ public class ProductStorageAdapterOut implements ProductStoragePortOut {
     @PostConstruct
     public void initBucket() {
         try {
+            log.info("Inicializando bucket: {}", bucket);
             boolean exists = minio.bucketExists(
                 BucketExistsArgs.builder().bucket(bucket).build()
             );
             if (!exists) {
+                log.info("Bucket '{}' não existe, criando...", bucket);
                 minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+                log.info("Bucket '{}' criado com sucesso", bucket);
+            } else {
+                log.info("Bucket '{}' já existe", bucket);
             }
         } catch (Exception e) {
+            log.error("Erro ao inicializar bucket '{}': {}", bucket, e.getMessage(), e);
             throw new StorageException("Erro ao criar bucket", e);
         }
     }

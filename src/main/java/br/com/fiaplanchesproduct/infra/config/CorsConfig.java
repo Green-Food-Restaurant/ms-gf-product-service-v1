@@ -14,8 +14,9 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Permite requisições de qualquer origem
-        config.addAllowedOrigin("*");
+        // Permite requisições de origens específicas
+        // Não podemos usar "*" com allowCredentials=true
+        config.addAllowedOriginPattern("*");
         
         // Permite os métodos HTTP mais comuns
         config.addAllowedMethod("GET");
@@ -39,4 +40,4 @@ public class CorsConfig {
         
         return new CorsFilter(source);
     }
-} 
+}

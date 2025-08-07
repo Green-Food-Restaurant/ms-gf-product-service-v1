@@ -1,10 +1,10 @@
 server:
   port: 8082
 minio:
-  url: ${MINIO_URL:http://173.249.12.112:9000}
-  access-key: ${MINIO_ACCESS_KEY:SAbx113Aam8BnOnBF2o5}
-  secret-key: ${MINIO_SECRET_KEY:OBdQcJCipQ7ZoQJFSR20AOiSkNEjP9xYPDYcg10F}
-  bucket: ${MINIO_BUCKET:fit-food-image-product}
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:green-food-image-product}
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/product}

@@ -30,9 +30,21 @@ services:
       - green-food-network
 
   ms-gf-product-service-v1:
-    image: dalexandrias/ms-gf-product-service-v1:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: dalexandrias/ms-gf-product-service-v1:latest
     ports:
       - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db-product:5432/product
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: green-food-image-product
     volumes:
       - ms-gf-product-service-v1:/var/lib/products/data
     depends_on:
