@@ -10,6 +10,15 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/product}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      pool-name: HikariPool
+      connection-test-query: SELECT 1
+      validation-timeout: 10000
   jpa:
     show-sql: false
     properties:
